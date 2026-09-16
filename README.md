@@ -1,29 +1,18 @@
-# rm-tennis-booking-system
-Tennis Lesson Booking System - FOR Coaches and Customers
 # 🎾 RM Tennis Booking System
 
-A web-based tennis lesson booking and confirmation system designed to simplify communication between a tennis coach and their clients.
-
-The project was developed from a real-world need: as a tennis coach, I wanted a simple way to propose lesson dates and times, allow clients to confirm their lesson using a unique booking code, and maintain an organised coaching schedule.
+A web-based tennis lesson booking and confirmation system designed to simplify communication between a tennis coach and their clients. The project was developed from a real-world need: as a tennis coach, I wanted a simple way to propose lesson dates and times, allow clients to confirm their lesson using a unique booking code, and maintain an organised coaching schedule.
 
 ## 🌐 Live Demo
 
 👉 **[View the RM Tennis Booking System](PASTE-YOUR-GITHUB-PAGES-LINK-HERE)**
 
 ### Demo Access
-
 To explore the customer booking experience:
-
 **Booking code:** `DEMO02`
-
 To explore the coach dashboard:
-
 **Demo PIN:** `1234`
-
 > The public portfolio version uses fictional demonstration data and does not connect to the live customer database.
-
----
-
+> 
 ## ✨ Features
 
 ### Customer Booking
