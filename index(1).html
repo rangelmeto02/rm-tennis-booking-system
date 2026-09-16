@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RM Tennis | Booking System — Portfolio Demo</title>
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="48" fill="%230B1F3A"/%3E%3Ccircle cx="50" cy="50" r="40" fill="none" stroke="%23F5F0E6" stroke-width="3"/%3E%3Ctext x="50" y="61" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="%23F5F0E6"%3ERM%3C/text%3E%3C/svg%3E'>
+<style>
+  :root{
+    --court: #0B1F3A;
+    --court-light: #17345D;
+    --chalk: #F5F0E6;
+    --chalk-dim: #EAE3D5;
+    --ball: #F5F0E6;
+    --clay: #B04B2A;
+    --ink: #17241D;
+    --ink-soft: #4C5A50;
+    --line: rgba(23,36,29,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--chalk);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:0 0 60px;}
+
+  /* Header / scoreboard */
+  header{
+    background:var(--court);
+    color:var(--chalk);
+    padding:28px 24px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    right:22px;
+    top:18px;
+    width:125px;
+    height:82px;
+    opacity:0.10;
+    border:2px solid var(--chalk);
+    background:
+      linear-gradient(to right, transparent 49%, var(--chalk) 49%, var(--chalk) 51%, transparent 51%),
+      linear-gradient(to bottom, transparent 49%, var(--chalk) 49%, var(--chalk) 51%, transparent 51%),
+      linear-gradient(to right, transparent 24%, var(--chalk) 24%, var(--chalk) 25%, transparent 25%),
+      linear-gradient(to right, transparent 75%, var(--chalk) 75%, var(--chalk) 76%, transparent 76%);
+    transform:rotate(-8deg);
+    pointer-events:none;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin:0 0 10px;
+    position:relative;
+    z-index:1;
+  }
+  .brand-rm{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:34px;
+    height:34px;
+    border:1.5px solid rgba(245,240,230,0.7);
+    border-radius:50%;
+    color:var(--chalk);
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:-0.02em;
+  }
+  .brand-name{
+    color:var(--chalk);
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:0.12em;
+  }
+  .brand-system{
+    color:rgba(245,240,230,0.65);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.10em;
+    padding-left:7px;
+    border-left:1px solid rgba(245,240,230,0.25);
+  }
+  h1{
+    font-size:28px;
+    font-weight:800;
+    margin:0;
+    letter-spacing:-0.01em;
+    line-height:1.15;
+  }
+  nav{
+    display:flex;
+    gap:8px;
+    margin:22px 0 0;
+    position:relative;
+    z-index:1;
+  }
+  nav button{
+    flex:1;
+    background:rgba(247,244,234,0.08);
+    color:var(--chalk);
+    border:1px solid rgba(247,244,234,0.18);
+    padding:11px 10px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background 0.15s ease;
+  }
+  nav button.active{
+    background:var(--ball);
+    color:var(--court);
+    border-color:var(--ball);
+  }
+  nav button:not(.active):hover{background:rgba(247,244,234,0.15);}
+
+  main{padding:28px 24px 0;}
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:22px;
+    margin-bottom:16px;
+  }
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  input, textarea{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-size:15px;
+    font-family:inherit;
+    color:var(--ink);
+    background:var(--chalk);
+  }
+  input:focus, textarea:focus{outline:2px solid var(--court-light);outline-offset:1px;}
+  textarea{resize:vertical;min-height:70px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  button.primary{
+    background:var(--court);
+    color:var(--chalk);
+    border:none;
+    padding:13px 18px;
+    border-radius:7px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    width:100%;
+  }
+  button.primary:hover{background:var(--court-light);}
+  button.primary:disabled{opacity:0.5;cursor:not-allowed;}
+  button.ghost{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink);
+    padding:10px 14px;
+    border-radius:7px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  button.ghost:hover{background:var(--chalk-dim);}
+  button.danger{color:var(--clay);border-color:rgba(176,75,42,0.35);}
+  button.danger:hover{background:rgba(176,75,42,0.06);}
+
+  .code-display{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--court);
+    color:var(--chalk);
+    padding:16px 18px;
+    border-radius:8px;
+    margin-top:14px;
+  }
+  .code-display .code{
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:0.08em;
+  }
+  .code-display span.label{font-size:12px;color:var(--ball);font-weight:700;display:block;margin-bottom:2px;}
+
+  .lesson-card{
+    border-left:4px solid var(--ball);
+    background:#fff;
+    border-radius:8px;
+    border-top:1px solid var(--line);
+    border-right:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    padding:16px 18px;
+    margin-bottom:12px;
+  }
+  .lesson-card.status-confirmed{border-left-color:var(--court-light);}
+  .lesson-card.status-cancelled{border-left-color:var(--clay);opacity:0.65;}
+  .lesson-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .lesson-name{font-weight:700;font-size:16px;margin:0 0 3px;}
+  .lesson-when{color:var(--ink-soft);font-size:14px;}
+  .badge{
+    font-size:11px;
+    font-weight:700;
+    padding:4px 9px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .badge.pending{background:rgba(245,240,230,0.9);color:#6b6f14;}
+  .badge.confirmed{background:rgba(47,107,80,0.15);color:var(--court-light);}
+  .badge.cancelled{background:rgba(176,75,42,0.12);color:var(--clay);}
+  .badge.paid{background:rgba(47,107,80,0.15);color:var(--court-light);}
+  .badge.unpaid{background:var(--chalk-dim);color:var(--ink-soft);}
+
+.lesson-details{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:18px 0 14px;
+}
+
+.lesson-detail{
+  background:var(--chalk);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:13px 14px;
+}
+
+.lesson-detail.date{
+  grid-column:1 / -1;
+}
+
+.detail-label{
+  display:block;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:0.08em;
+  color:var(--ink-soft);
+  margin-bottom:4px;
+}
+
+.detail-value{
+  display:block;
+  font-size:17px;
+  font-weight:750;
+  color:var(--court);
+}
+
+  .lesson-notes{font-size:14px;color:var(--ink-soft);margin-top:8px;}
+  .lesson-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+  .lesson-actions button{padding:7px 12px;font-size:13px;}
+
+  .date-group{
+  margin-bottom:12px;
+}
+
+.date-header{
+  width:100%;
+  background:var(--court);
+  color:var(--chalk);
+  border:none;
+  border-radius:8px;
+  padding:14px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  font-size:15px;
+  font-weight:700;
+  text-align:left;
+}
+
+.date-header:hover{
+  background:var(--court-light);
+}
+
+.date-count{
+  font-size:12px;
+  font-weight:600;
+  opacity:0.8;
+}
+
+.date-lessons{
+  display:none;
+  padding-top:10px;
+}
+
+.date-lessons.open{
+  display:block;
+}
+
+  .empty{
+    text-align:center;
+    padding:36px 20px;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+  .section-title{
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin:24px 0 10px;
+  }
+  .helper{font-size:13px;color:var(--ink-soft);margin-top:8px;line-height:1.5;}
+  .center{text-align:center;}
+  .pin-gate{padding:60px 24px;text-align:center;}
+  .pin-gate input{text-align:center;font-size:22px;letter-spacing:0.3em;max-width:180px;margin:0 auto 14px;}
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:var(--chalk);
+    padding:11px 20px;border-radius:8px;font-size:14px;font-weight:600;
+    box-shadow:0 6px 20px rgba(0,0,0,0.2);
+    z-index:50;opacity:0;pointer-events:none;transition:opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+  .loading{padding:40px;text-align:center;color:var(--ink-soft);font-size:14px;}
+
+  .portfolio-demo-label{
+    margin:8px 0 0;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:0.12em;
+    opacity:0.68;
+    position:relative;
+    z-index:1;
+  }
+
+  .rm-footer{
+    text-align:center;
+    padding:22px 24px 32px;
+    color:var(--court);
+  }
+  .tennis-divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:14px;
+  }
+  .tennis-divider span{
+    height:1px;
+    background:var(--court);
+    opacity:0.18;
+    width:70px;
+  }
+  .tennis-ball{font-size:18px;}
+  .footer-brand{
+    margin:0;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:0.14em;
+  }
+  .footer-text{
+    margin:4px 0 0;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="brand">
+      <span class="brand-rm">RM</span>
+      <span class="brand-name">TENNIS</span>
+      <span class="brand-system">BOOKING SYSTEM</span>
+    </p>
+    <h1 id="headerTitle">Confirm your lesson</h1>
+    <p class="portfolio-demo-label">PORTFOLIO DEMO · FICTIONAL DATA</p>
+    <nav>
+      <button id="tabCustomer" class="active">Confirm a lesson</button>
+      <button id="tabCoach">My schedule</button>
+    </nav>
+  </header>
+  <main id="main"></main>
+  <footer class="rm-footer">
+    <div class="tennis-divider">
+      <span></span>
+      <div class="tennis-ball">🎾</div>
+      <span></span>
+    </div>
+    <p class="footer-brand">RM TENNIS</p>
+    <p class="footer-text">Coaching with Rangel</p>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- PUBLIC PORTFOLIO DEMO
+     No live Firebase connection or real customer database is used here.
+     All lesson data below is fictional and resets on refresh. -->
+
+<script>
+const COACH_PIN = "1234"; // DEMO ONLY — client-side access, not production authentication
+
+function demoDate(daysFromToday){
+  const d = new Date();
+  d.setHours(12,0,0,0);
+  d.setDate(d.getDate() + daysFromToday);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+let lessons = [
+  {
+    code:"DEMO01",
+    customerName:"Alex Morgan",
+    date:demoDate(0),
+    time:"10:00",
+    price:"35.00",
+    notes:"Demo lesson — serve technique",
+    status:"confirmed",
+    paymentStatus:"paid",
+    createdAt:Date.now()-3000
+  },
+  {
+    code:"DEMO02",
+    customerName:"Jamie Taylor",
+    date:demoDate(0),
+    time:"15:30",
+    price:"40.00",
+    notes:"Demo lesson — baseline consistency",
+    status:"pending",
+    paymentStatus:"unpaid",
+    createdAt:Date.now()-2000
+  },
+  {
+    code:"DEMO03",
+    customerName:"Sam Wilson",
+    date:demoDate(1),
+    time:"09:30",
+    price:"30.00",
+    notes:"Demo lesson — match play",
+    status:"pending",
+    paymentStatus:"unpaid",
+    createdAt:Date.now()-1000
+  }
+];
+let view = "customer"; // customer | coach-gate | coach
+let customerFoundCode = null;
+
+function uid(){
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let s = "";
+  for(let i=0;i<6;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+async function loadLessons(){
+  // Portfolio demo: fictional lesson data is already loaded above.
+  return lessons;
+}
+
+// Portfolio demo: changes work during the session and reset on refresh.
+async function saveLesson(lesson){
+  return true;
+}
+
+function fmtDate(dateStr){
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+}
+function fmtTime(t){
+  const [h,m] = t.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const h12 = ((h+11)%12)+1;
+  return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+function setActiveTab(){
+  document.getElementById("tabCustomer").classList.toggle("active", view==="customer");
+  document.getElementById("tabCoach").classList.toggle("active", view==="coach"||view==="coach-gate");
+  document.getElementById("headerTitle").textContent = (view==="coach"||view==="coach-gate") ? "My schedule" : "Confirm your lesson";
+}
+
+// ---------- CUSTOMER VIEW ----------
+function renderCustomer(){
+  setActiveTab();
+  const main = document.getElementById("main");
+  main.innerHTML = `
+    <div class="card">
+      <p style="margin-top:0; line-height:1.6;">
+    <strong>Welcome to the RM Tennis Booking System!</strong><br>
+    Here you can confirm your tennis lesson with Coach Rangel.
+    Simply enter your booking code below and confirm your lesson.
+    See you on court — enjoy! 🎾
+  </p>
+
+      <div class="field">
+        <label for="codeInput">Booking code</label>
+        <input id="codeInput" placeholder="e.g. 7K3M9P" maxlength="6" autocapitalize="characters">
+      </div>
+      <button class="primary" id="findBtn">Find my lesson</button>
+      <p class="helper">Portfolio demo: try booking code <strong>DEMO02</strong>. All names and lesson details are fictional.</p>
+    </div>
+    <div id="lessonResult"></div>
+  `;
+  document.getElementById("findBtn").onclick = handleFindLesson;
+  document.getElementById("codeInput").addEventListener("keydown", e=>{
+    if(e.key === "Enter") handleFindLesson();
+  });
+  if(customerFoundCode){
+    renderCustomerLesson(customerFoundCode);
+  }
+}
+
+function handleFindLesson(){
+  const code = document.getElementById("codeInput").value.trim().toUpperCase();
+  if(!code) return;
+  const lesson = lessons.find(l => l.code === code);
+  const resultEl = document.getElementById("lessonResult");
+  if(!lesson){
+    resultEl.innerHTML = `<div class="card"><p class="empty">No lesson found for that code. Double check it with your coach.</p></div>`;
+    return;
+  }
+  customerFoundCode = code;
+  renderCustomerLesson(code);
+}
+
+function renderCustomerLesson(code){
+  const lesson = lessons.find(l => l.code === code);
+  const resultEl = document.getElementById("lessonResult");
+  if(!lesson){ resultEl.innerHTML=""; return; }
+
+  let statusLine, actionHtml;
+  if(lesson.status === "cancelled"){
+    statusLine = `<span class="badge cancelled">Cancelled</span>`;
+    actionHtml = `<p class="helper">This lesson has been cancelled. Reach out to your coach if that's unexpected.</p>`;
+  } else if(lesson.status === "confirmed"){
+    statusLine = `<span class="badge confirmed">Confirmed</span>`;
+    actionHtml = `
+    <div style="margin-top:10px;">
+      <p style="font-weight:700; margin-bottom:6px;">Lesson confirmed! 🎾</p>
+      <p class="helper" style="margin-top:0;">
+        Your lesson price is <strong>£${Number(lesson.price).toFixed(2)}</strong>.<br>
+        Payment is made in person at the lesson.<br>
+        See you on court!
+      </p>
+    </div>`;
+  } else {
+    statusLine = `<span class="badge pending">Awaiting your confirmation</span>`;
+    actionHtml = `<button class="primary" id="confirmBtn" style="margin-top:6px;">Confirm this lesson</button>
+                  <p class="helper">Payment is handled in person at the lesson — nothing to pay online.</p>`;
+  }
+
+  resultEl.innerHTML = `
+    <div class="lesson-card status-${lesson.status}">
+      <div class="lesson-top">
+        <div>
+          <p class="lesson-name">${escapeHtml(lesson.customerName)}</p>
+        </div>
+        ${statusLine}
+      </div>
+
+      <div class="lesson-details">
+        <div class="lesson-detail date">
+          <span class="detail-label">DATE</span>
+          <span class="detail-value">${fmtDate(lesson.date)}</span>
+        </div>
+
+        <div class="lesson-detail">
+          <span class="detail-label">TIME</span>
+          <span class="detail-value">${fmtTime(lesson.time)}</span>
+        </div>
+
+        <div class="lesson-detail">
+          <span class="detail-label">PRICE</span>
+          <span class="detail-value">${lesson.price ? `£${Number(lesson.price).toFixed(2)}` : "—"}</span>
+        </div>
+      </div>
+
+      ${lesson.notes ? `<p class="lesson-notes">${escapeHtml(lesson.notes)}</p>` : ""}
+
+      <div style="margin-top:14px;">${actionHtml}</div>
+    </div>
+  `;
+  const btn = document.getElementById("confirmBtn");
+  if(btn){
+    btn.onclick = async ()=>{
+      btn.disabled = true;
+      btn.textContent = "Confirming…";
+      lesson.status = "confirmed";
+      const ok = await saveLesson(lesson);
+      if(ok){ showToast("Lesson confirmed"); renderCustomerLesson(code); }
+      else { btn.disabled=false; btn.textContent="Confirm this lesson"; }
+    };
+  }
+}
+
+function escapeHtml(s){
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ---------- COACH GATE ----------
+function renderCoachGate(){
+  setActiveTab();
+  const main = document.getElementById("main");
+  main.innerHTML = `
+    <div class="pin-gate">
+      <p class="helper" style="margin-bottom:16px;">Portfolio demo — enter PIN <strong>1234</strong> to view the coach dashboard.</p>
+      <input id="pinInput" type="password" maxlength="6" inputmode="numeric">
+      <div><button class="primary" id="pinBtn" style="max-width:180px;">Unlock</button></div>
+    </div>
+  `;
+  document.getElementById("pinBtn").onclick = ()=>{
+    const val = document.getElementById("pinInput").value;
+    if(val === COACH_PIN){
+      view = "coach";
+      renderCoach();
+    } else {
+      showToast("Incorrect PIN");
+    }
+  };
+  document.getElementById("pinInput").addEventListener("keydown", e=>{
+    if(e.key==="Enter") document.getElementById("pinBtn").click();
+  });
+}
+
+// ---------- COACH VIEW ----------
+function renderCoach(){
+  setActiveTab();
+  const main = document.getElementById("main");
+  const today = new Date().toISOString().split("T")[0];
+
+  const upcoming = lessons.filter(l => l.status !== "cancelled" && l.date >= today)
+    .sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
+  const past = lessons.filter(l => l.date < today || l.status === "cancelled")
+    .sort((a,b)=> (b.date+b.time).localeCompare(a.date+a.time));
+
+  main.innerHTML = `
+    <div class="card">
+      <p class="section-title" style="margin-top:0;">Propose a new lesson</p>
+      <div class="field">
+        <label for="custName">Customer name</label>
+        <input id="custName" placeholder="e.g. Jamie Lin">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="lessonDate">Date</label>
+          <input id="lessonDate" type="date" value="${today}">
+        </div>
+        <div class="field">
+          <label for="lessonTime">Time</label>
+          <input id="lessonTime" type="time" value="16:00">
+        </div>
+      </div>
+      <div class="field">
+        <label for="lessonPrice">Lesson price (£)</label>
+        <input id="lessonPrice" type="number" min="0" step="0.01" placeholder="e.g. 35.00">
+      </div>
+      
+      <div class="field">
+        <label for="lessonNotes">Note (optional)</label>
+        <textarea id="lessonNotes" placeholder="e.g. Bring your own racket, we'll work on serves"></textarea>
+      </div>
+      <button class="primary" id="createBtn">Create booking code</button>
+      <div id="newCodeArea"></div>
+    </div>
+
+    <p class="section-title">Upcoming (${upcoming.length})</p>
+    <div id="upcomingList">${groupedUpcomingLessons(upcoming)}</div>
+    ${past.length ? `<p class="section-title">Past &amp; cancelled</p><div id="pastList">${past.map(lessonRow).join("")}</div>` : ""}
+
+    <div style="margin-top:24px;text-align:center;">
+      <button class="ghost" id="lockBtn">Lock schedule</button>
+    </div>
+  `;
+
+  document.getElementById("createBtn").onclick = handleCreateLesson;
+  document.getElementById("lockBtn").onclick = ()=>{ view="coach-gate"; renderCoachGate(); };
+
+  document.querySelectorAll(".date-header").forEach(btn => {
+  btn.onclick = () => {
+    const section = document.getElementById(`date-${btn.dataset.date}`);
+    section.classList.toggle("open");
+
+    const count = btn.querySelector(".date-count");
+    const isOpen = section.classList.contains("open");
+
+    count.innerHTML = count.innerHTML.replace(
+      isOpen ? "▾" : "▴",
+      isOpen ? "▴" : "▾"
+    );
+  };
+});
+  bindLessonRowActions();
+}
+function scheduleDateLabel(dateStr){
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+
+  const toLocalDateString = d =>
+    `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+  const todayStr = toLocalDateString(today);
+  const tomorrowStr = toLocalDateString(tomorrow);
+
+  if(dateStr === todayStr) return `TODAY · ${fmtDate(dateStr)}`;
+  if(dateStr === tomorrowStr) return `TOMORROW · ${fmtDate(dateStr)}`;
+  return fmtDate(dateStr);
+}
+
+function groupedUpcomingLessons(upcoming){
+  if(!upcoming.length){
+    return `<div class="card"><p class="empty">Nothing upcoming yet — create a booking above.</p></div>`;
+  }
+
+  const groups = {};
+
+  upcoming.forEach(lesson => {
+    if(!groups[lesson.date]){
+      groups[lesson.date] = [];
+    }
+    groups[lesson.date].push(lesson);
+  });
+
+  return Object.keys(groups)
+    .sort()
+    .map(date => {
+
+      const dayLessons = groups[date]
+        .sort((a,b) => a.time.localeCompare(b.time));
+
+      const count = dayLessons.length;
+
+      return `
+        <div class="date-group">
+
+          <button class="date-header" data-date="${date}">
+            <span>${scheduleDateLabel(date)}</span>
+            <span class="date-count">
+              ${count} ${count === 1 ? "lesson" : "lessons"} ▾
+            </span>
+          </button>
+
+          <div class="date-lessons" id="date-${date}">
+            ${dayLessons.map(lessonRow).join("")}
+          </div>
+
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function lessonRow(l){
+  const statusBadge = l.status === "confirmed" ? `<span class="badge confirmed">Confirmed</span>`
+    : l.status === "cancelled" ? `<span class="badge cancelled">Cancelled</span>`
+    : `<span class="badge pending">Pending</span>`;
+  const payBadge = l.paymentStatus === "paid" ? `<span class="badge paid">Paid</span>` : `<span class="badge unpaid">Unpaid</span>`;
+
+  let actions = "";
+  if(l.status !== "cancelled"){
+    actions += `<button class="ghost" data-action="toggle-pay" data-code="${l.code}">${l.paymentStatus==="paid" ? "Mark unpaid" : "Mark paid"}</button>`;
+    actions += `<button class="ghost" data-action="copy-code" data-code="${l.code}">Copy code</button>`;
+    actions += `<button class="ghost danger" data-action="cancel" data-code="${l.code}">Cancel</button>`;
+  }
+
+  return `
+    <div class="lesson-card status-${l.status}">
+      <div class="lesson-top">
+        <div>
+          <p class="lesson-name">${escapeHtml(l.customerName)}</p>
+          <p class="lesson-when">${fmtDate(l.date)} · ${fmtTime(l.time)}</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+          ${statusBadge}
+          ${payBadge}
+        </div>
+      </div>
+      ${l.price ? `<p class="lesson-notes"><strong>Price: £${Number(l.price).toFixed(2)}</strong></p>` : ""}
+      ${l.notes ? `<p class="lesson-notes">${escapeHtml(l.notes)}</p>` : ""}
+      <p class="lesson-notes" style="font-family:monospace;letter-spacing:0.05em;">Code: ${l.code}</p>
+      <div class="lesson-actions">${actions}</div>
+    </div>
+  `;
+}
+
+function bindLessonRowActions(){
+  document.querySelectorAll('[data-action="toggle-pay"]').forEach(btn=>{
+    btn.onclick = async ()=>{
+      const l = lessons.find(x=>x.code===btn.dataset.code);
+      l.paymentStatus = l.paymentStatus === "paid" ? "unpaid" : "paid";
+      const ok = await saveLesson(l);
+      if(ok) renderCoach();
+    };
+  });
+  document.querySelectorAll('[data-action="copy-code"]').forEach(btn=>{
+    btn.onclick = ()=>{
+      navigator.clipboard?.writeText(btn.dataset.code).catch(()=>{});
+      showToast(`Code ${btn.dataset.code} copied`);
+    };
+  });
+  document.querySelectorAll('[data-action="cancel"]').forEach(btn=>{
+    btn.onclick = async ()=>{
+      const l = lessons.find(x=>x.code===btn.dataset.code);
+      l.status = "cancelled";
+      const ok = await saveLesson(l);
+      if(ok){ showToast("Lesson cancelled"); renderCoach(); }
+    };
+  });
+}
+
+async function handleCreateLesson(){
+  const name = document.getElementById("custName").value.trim();
+  const date = document.getElementById("lessonDate").value;
+  const time = document.getElementById("lessonTime").value;
+  const price = document.getElementById("lessonPrice").value;
+  const notes = document.getElementById("lessonNotes").value.trim();
+  if(!name || !date || !time){
+    showToast("Fill in name, date, and time");
+    return;
+  }
+  const code = uid();
+  const lesson = { code, customerName:name, date, time, price, notes, status:"pending", paymentStatus:"unpaid", createdAt: Date.now() };
+  lessons.push(lesson);
+  const btn = document.getElementById("createBtn");
+  btn.disabled = true;
+  btn.textContent = "Creating…";
+  const ok = await saveLesson(lesson);
+  if(ok){
+    document.getElementById("newCodeArea").innerHTML = `
+      <div class="code-display">
+        <div><span class="label">Share this code with ${escapeHtml(name)}</span><span class="code">${code}</span></div>
+        <button class="ghost" style="background:rgba(247,244,234,0.15);color:var(--chalk);border-color:rgba(247,244,234,0.3);" onclick="navigator.clipboard.writeText('${code}');this.textContent='Copied';">Copy</button>
+      </div>
+    `;
+    setTimeout(()=>renderCoach(), 50);
+  } else {
+    lessons.pop();
+    btn.disabled = false;
+    btn.textContent = "Create booking code";
+  }
+}
+
+// ---------- INIT ----------
+document.getElementById("tabCustomer").onclick = ()=>{ view="customer"; renderCustomer(); };
+document.getElementById("tabCoach").onclick = ()=>{
+  if(view === "coach"){ renderCoach(); }
+  else { view = "coach-gate"; renderCoachGate(); }
+};
+
+(async function init(){
+  document.getElementById("main").innerHTML = `<div class="loading">Loading…</div>`;
+  await loadLessons();
+  renderCustomer();
+})();
+</script>
+</body>
+</html>
